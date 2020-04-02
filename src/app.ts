@@ -1,17 +1,22 @@
+import {join} from 'path';
+
 import * as Koa from 'koa';
 import * as Router from '@koa/router';
-import {join} from 'path';
+import * as morgan from 'koa-morgan';
 
 import logger from './logger';
 import serveImage from './image/imageServer';
 import {NotImplementedError, RequestError} from './image/errors';
+
+if (process.env.NODE_ENV !== 'production')
+    require('dotenv').config();
 
 const router = new Router();
 
 router.get('/:path/:region/:size/:rotation/:quality.:format', async ctx => {
     logger.info(`Received a request for an image on path ${ctx.params.path}`);
 
-    const path = join(process.env.ROOT_PATH as string, ctx.params.path);
+    const path = join(process.env.IIIF_IMAGE_ROOT_PATH as string, ctx.params.path);
     const image = await serveImage(path, {
         region: ctx.params.region,
         size: ctx.params.size,
@@ -56,10 +61,8 @@ app.on('error', (err, ctx) => {
 });
 
 if (process.env.NODE_ENV !== 'production') {
-    import('koa-morgan').then(morgan => {
-        // @ts-ignore
-        app.use(morgan('short', {'stream': logger.stream}));
-    });
+    // @ts-ignore
+    app.use(morgan('short', {'stream': logger.stream}));
 }
 
 app.use(router.routes());
