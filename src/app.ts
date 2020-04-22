@@ -17,7 +17,8 @@ router.get('/:path/:region/:size/:rotation/:quality.:format', async ctx => {
     logger.info(`Received a request for an image on path ${ctx.params.path}`);
 
     const path = join(process.env.IIIF_IMAGE_ROOT_PATH as string, ctx.params.path);
-    const image = await serveImage(path, {
+    const maxSize = ctx.query.max ? parseInt(ctx.query.max) : null;
+    const image = await serveImage(path, maxSize, {
         region: ctx.params.region,
         size: ctx.params.size,
         rotation: ctx.params.rotation,

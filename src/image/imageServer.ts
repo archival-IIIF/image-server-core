@@ -19,8 +19,9 @@ export interface ImageResult {
     contentLength: number
 }
 
-export default async function serveImage(path: string, options: ImageOptions): Promise<ImageResult> {
-    const imageProcessing = new ImageProcessing(path, [
+export default async function serveImage(path: string, maxSize: number | null,
+                                         options: ImageOptions): Promise<ImageResult> {
+    const imageProcessing = new ImageProcessing(path, maxSize, [
         new RegionRequest(options.region),
         new SizeRequest(options.size),
         new RotateRequest(options.rotation),
