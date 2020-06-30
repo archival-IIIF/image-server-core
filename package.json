@@ -25,5 +25,10 @@
     "sinon": "9.0.1",
     "chai": "4.2.0",
     "sinon-chai": "3.5.0"
+  },
+  "scripts": {
+    "start": "ts-node ./src/app.ts",
+    "watch": "nodemon --watch \"src/**/*\" -e ts,tsx --exec ts-node ./src/app.ts",
+    "build": "tsc"
   }
 }
