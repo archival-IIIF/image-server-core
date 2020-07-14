@@ -1,15 +1,24 @@
+if (process.env.NODE_ENV !== 'production')
+    require('dotenv').config();
+
 import {join} from 'path';
 
 import * as Koa from 'koa';
 import * as Router from '@koa/router';
 import * as morgan from 'koa-morgan';
+import * as sharp from 'sharp';
 
 import logger from './logger';
 import serveImage from './image/imageServer';
 import {NotImplementedError, RequestError} from './image/errors';
 
-if (process.env.NODE_ENV !== 'production')
-    require('dotenv').config();
+sharp.concurrency(process.env.IIIF_IMAGE_CONCURRENCY ? parseInt(process.env.IIIF_IMAGE_CONCURRENCY) : 0);
+sharp.queue.on('change', queueLength =>
+    logger.debug(`Sharp queue now contains ${queueLength} task(s)`));
+
+logger.debug(`Sharp supports formats: ${JSON.stringify(sharp.format)}`);
+logger.debug(`Sharp versions: ${JSON.stringify(sharp.versions)}`);
+logger.debug(`Sharp number of threads: ${sharp.concurrency()}`);
 
 const router = new Router();
 
