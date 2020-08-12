@@ -1,4 +1,4 @@
-FROM node:12.18.2-alpine AS builder
+FROM node:12.18.3-alpine AS builder
 
 # Install global NPM tooling
 RUN npm install typescript -g
@@ -15,7 +15,7 @@ RUN npm install --production
 RUN tsc
 
 # Create the actual image
-FROM node:12.18.2-alpine
+FROM node:12.18.3-alpine
 
 # Copy application build from builder
 COPY --from=builder /opt/ /opt/

@@ -21,7 +21,7 @@ export default class ImageProcessing {
         this.requests.forEach(request => request.parseImageRequest(imageRequestSize));
 
         const pipeline = this.getPipeline();
-        if (this.maxSize)
+        if (this.maxSize && (size.width === this.maxSize || size.height === this.maxSize))
             pipeline.resize(size.width, size.height, {fit: 'fill'});
 
         if (this.requests.filter(request => request.requiresImageProcessing()).length > 0)
@@ -41,13 +41,11 @@ export default class ImageProcessing {
         const width = metadata.width as number;
         const height = metadata.height as number;
 
-        if (this.maxSize)
-            return {
-                width: (width > height)
-                    ? this.maxSize : Math.round(width * (this.maxSize / height)),
-                height: (height > width)
-                    ? this.maxSize : Math.round(height * (this.maxSize / width))
-            }
+        if (this.maxSize && width > height && width > this.maxSize)
+            return {width: this.maxSize, height: Math.round(height * (this.maxSize / width))};
+
+        if (this.maxSize && height > width && height > this.maxSize)
+            return {width: Math.round(width * (this.maxSize / height)), height: this.maxSize};
 
         return {width, height};
     }
