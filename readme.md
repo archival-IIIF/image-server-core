@@ -17,14 +17,6 @@ E.g. http://localhost:3333/example.jpg/full/!100,100/0/default.jpg
 
 Use the provided Docker Compose or install manually.
 
-### Docker Compose
-
-1. See for example the provided `docker-compose.yml.example`:
-    * Note: Clone the `web` service definition to create multiple services and use the env variable 
-    `IIIF_SERVER_SERVICES` to define which services that container should run.
-1. Set up the configuration (See .env.example for the example configuration)
-    * Set up the environment variables in the Docker Compose file
-
 ### Manual installation
 
 1. Install
