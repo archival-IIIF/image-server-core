@@ -61,5 +61,10 @@ Use the provided Docker Compose or install manually.
             <td>Winston log level</td>
             <td>E.g. <code>debug</code> see <a href="https://github.com/winstonjs/winston#logging-levels">here</a></td>
         </tr>
+        <tr>
+            <td>IIIF_IMAGE_CONCURRENCY</td>
+            <td>parameter, which controls the number of threads libvips can use for image processing.</td>
+            <td>By default it takes the number of CPU cores available. Specify 0 to make it explicit.</td>
+        </tr>
     </tbody>
 </table>
