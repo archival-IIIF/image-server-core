@@ -15,10 +15,6 @@ E.g. http://localhost:3333/example.jpg/full/!100,100/0/default.jpg
 
 ## Installation
 
-Use the provided Docker Compose or install manually.
-
-### Manual installation
-
 1. Install
     * [Node.js 12.x LTS](https://nodejs.org/en)
     * [yarn](https://yarnpkg.com) or [npm](https://www.npmjs.com)
