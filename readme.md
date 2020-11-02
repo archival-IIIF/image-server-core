@@ -16,7 +16,7 @@ E.g. http://localhost:3333/example.jpg/full/!100,100/0/default.jpg
 ## Installation
 
 1. Install
-    * [Node.js 12.x LTS](https://nodejs.org/en)
+    * [Node.js 14.x LTS](https://nodejs.org/en)
     * [yarn](https://yarnpkg.com) or [npm](https://www.npmjs.com)
 1. Set up the configuration (See .env.example for the example configuration)
     * Copy .env.example to .env and set up the parameters for development
