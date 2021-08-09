@@ -1,14 +1,12 @@
 import sharp from "sharp";
-import logger from "../../image/src/logger";
 
-export function setConcurrency(concurrency?: number): number {
-    return sharp.concurrency(concurrency);
-}
+export default class Helpers {
 
-export function getSharp(): sharp {
-    return sharp;
-}
+    static setConcurrency(concurrency?: number): number {
+        return sharp.concurrency(concurrency);
+    }
 
-export function getSupportedFormats(): string[] {
-    return Object.keys(sharp.format);
+    static getSupportedFormats(): string[] {
+        return Object.keys(sharp.format);
+    }
 }
