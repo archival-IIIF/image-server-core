@@ -5,8 +5,8 @@ import RegionRequest from './RegionRequest';
 import RotateRequest from './RotateRequest';
 import SizeRequest from './SizeRequest';
 import serveImage from './imageServer';
-import Helpers from './Helpers';
+import {getSupportedFormats, setConcurrency} from './Helpers';
 import {RequestError, NotImplementedError} from './errors';
 
 export {FormatRequest, ImageProcessing, QualityRequest, RegionRequest, RotateRequest, SizeRequest, serveImage,
-    RequestError, NotImplementedError, Helpers}
+    RequestError, NotImplementedError, getSupportedFormats, setConcurrency}

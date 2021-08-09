@@ -1,12 +1,9 @@
 import sharp from "sharp";
 
-export default class Helpers {
+export function setConcurrency(concurrency?: number): number {
+    return sharp.concurrency(concurrency);
+}
 
-    static setConcurrency(concurrency?: number): number {
-        return sharp.concurrency(concurrency);
-    }
-
-    static getSupportedFormats(): string[] {
-        return Object.keys(sharp.format);
-    }
+export function getSupportedFormats(): string[] {
+    return Object.keys(sharp.format);
 }
