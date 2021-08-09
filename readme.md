@@ -1,2 +1,3 @@
 # image-server-core
-Core functions to build a iiif image server
+
+Core functions to build an iiif image server
