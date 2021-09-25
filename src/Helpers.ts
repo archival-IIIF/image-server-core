@@ -1,4 +1,4 @@
-import sharp from "sharp";
+import * as sharp from "sharp";
 
 export function setConcurrency(concurrency?: number): number {
     return sharp.concurrency(concurrency);
