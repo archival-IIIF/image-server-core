@@ -1,12 +1,25 @@
 import {Size, ImageRequest} from './ImageProcessing';
 import {NotImplementedError, RequestError} from './errors';
-import {JpegOptions, OutputOptions, PngOptions, Sharp, TiffOptions, WebpOptions} from 'sharp';
+import {
+    AvifOptions,
+    FormatEnum,
+    HeifOptions,
+    JpegOptions,
+    OutputOptions,
+    PngOptions,
+    Sharp,
+    TiffOptions,
+    WebpOptions
+} from 'sharp';
+
+type OutputFormatOption =
+    (OutputOptions | JpegOptions | PngOptions | WebpOptions | TiffOptions | AvifOptions | HeifOptions)
+    & { id: keyof FormatEnum };
 
 export default class FormatRequest implements ImageRequest {
-    private formatOptions: (OutputOptions | JpegOptions | PngOptions | WebpOptions | TiffOptions) & { id: string }
-        = FormatRequest.OUTPUT_FORMATS.jpg;
+    private formatOptions: OutputFormatOption = FormatRequest.OUTPUT_FORMATS.jpg;
 
-    private static OUTPUT_FORMATS = {
+    private static OUTPUT_FORMATS: { [name: string]: OutputFormatOption } = {
         jpg: {
             id: 'jpeg',
             quality: 80,
@@ -24,6 +37,14 @@ export default class FormatRequest implements ImageRequest {
         tif: {
             id: 'tiff',
             quality: 80
+        },
+        avif: {
+            id: 'avif',
+            quality: 80
+        },
+        heif: {
+            id: 'heif',
+            quality: 80
         }
     };
 
@@ -36,6 +57,8 @@ export default class FormatRequest implements ImageRequest {
             case 'png':
             case 'webp':
             case 'tif':
+            case 'avif':
+            case 'heif':
                 this.formatOptions = FormatRequest.OUTPUT_FORMATS[this.request];
                 break;
             case 'gif':

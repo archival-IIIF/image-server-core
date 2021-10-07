@@ -50,6 +50,10 @@ function getContentType(extension: string): string {
             return 'image/png';
         case 'webp':
             return 'image/webp';
+        case 'avif':
+            return 'image/avif';
+        case 'heif':
+            return 'image/heif';
         default:
             return 'application/octet-stream';
     }

@@ -26,7 +26,12 @@ router.get('/:path/:region/:size/:rotation/:quality.:format', async ctx => {
     logger.info(`Received a request for an image on path ${ctx.params.path}`);
 
     const path = join(process.env.IIIF_IMAGE_ROOT_PATH as string, ctx.params.path);
-    const maxSize = ctx.query.max ? parseInt(ctx.query.max) : null;
+    const maxSize = Array.isArray(ctx.query.max)
+        ? parseInt(ctx.query.max[0])
+        : ctx.query.max
+            ? parseInt(ctx.query.max) 
+            : null;
+
     const image = await serveImage(path, maxSize, {
         region: ctx.params.region,
         size: ctx.params.size,
@@ -38,7 +43,7 @@ router.get('/:path/:region/:size/:rotation/:quality.:format', async ctx => {
     ctx.body = image.image;
     if (image.contentType) ctx.set('Content-Type', image.contentType);
     if (image.contentLength) ctx.set('Content-Length', String(image.contentLength));
-    ctx.set('Content-Disposition', `inline; filename="${ctx.params.id}-${ctx.params.region}-${ctx.params.size}-${ctx.params.rotation}-${ctx.params.quality}.${ctx.params.format}"`);
+    ctx.set('Content-Disposition', `inline; filename="${ctx.params.path}-${ctx.params.region}-${ctx.params.size}-${ctx.params.rotation}-${ctx.params.quality}.${ctx.params.format}"`);
 
     logger.info(`Sending an image on path ${ctx.params.path}`);
 });
