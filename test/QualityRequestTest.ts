@@ -2,8 +2,8 @@ import * as sinon from 'sinon';
 import {expect} from 'chai';
 import * as sharp from 'sharp';
 
-import QualityRequest from '../../src/image/QualityRequest';
-import {RequestError} from '../../src/image/errors';
+import QualityRequest from '../src/QualityRequest';
+import {RequestError} from '../src/errors';
 
 describe('QualityRequest', () => {
     const size = {width: 200, height: 100};

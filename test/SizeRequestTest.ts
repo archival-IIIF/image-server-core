@@ -2,8 +2,8 @@ import * as sinon from 'sinon';
 import {expect} from 'chai';
 import * as sharp from 'sharp';
 
-import SizeRequest from '../../src/image/SizeRequest';
-import {RequestError} from '../../src/image/errors';
+import SizeRequest from '../src/SizeRequest';
+import {RequestError} from '../src/errors';
 
 describe('SizeRequest', () => {
     const getSize = (width: number, height: number) => ({width: width, height: height});

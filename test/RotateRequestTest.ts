@@ -2,8 +2,8 @@ import * as sinon from 'sinon';
 import {expect} from 'chai';
 import * as sharp from 'sharp';
 
-import RotateRequest from '../../src/image/RotateRequest';
-import {RequestError} from '../../src/image/errors';
+import RotateRequest from '../src/RotateRequest';
+import {RequestError} from '../src/errors';
 
 describe('RotateRequest', () => {
     const size = {width: 200, height: 100};
