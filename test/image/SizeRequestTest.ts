@@ -1,6 +1,6 @@
-import sinon from 'sinon';
+import * as sinon from 'sinon';
 import {expect} from 'chai';
-import sharp from 'sharp';
+import * as sharp from 'sharp';
 
 import SizeRequest from '../../src/image/SizeRequest';
 import {RequestError} from '../../src/image/errors';

@@ -1,4 +1,4 @@
-import sharp from 'sharp';
+import * as sharp from 'sharp';
 
 export interface ImageRequest {
     parseImageRequest(size: Size): void;

@@ -3,10 +3,10 @@ if (process.env.NODE_ENV !== 'production')
 
 import {join} from 'path';
 
-import Koa from 'koa';
-import Router from '@koa/router';
-import morgan from 'koa-morgan';
-import sharp from 'sharp';
+import * as Koa from 'koa';
+import * as Router from '@koa/router';
+import * as morgan from 'koa-morgan';
+import * as sharp from 'sharp';
 
 import logger from './logger';
 import serveImage from './image/imageServer';
