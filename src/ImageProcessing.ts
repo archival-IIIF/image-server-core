@@ -1,9 +1,9 @@
-import * as sharp from 'sharp';
+import sharp, {Sharp} from 'sharp';
 
 export interface ImageRequest {
     parseImageRequest(size: Size): void;
     requiresImageProcessing(): boolean;
-    executeImageProcessing(image: sharp.Sharp): void;
+    executeImageProcessing(image: Sharp): void;
 }
 
 export interface Size {
@@ -30,7 +30,7 @@ export default class ImageProcessing {
         return pipeline.toBuffer({resolveWithObject: true});
     }
 
-    private getPipeline(): sharp.Sharp {
+    private getPipeline(): Sharp {
         return sharp(this.path);
     }
 
