@@ -77,4 +77,8 @@ export default class FormatRequest implements ImageRequest {
     executeImageProcessing(image: Sharp): void {
         if (this.requiresImageProcessing()) image.toFormat(this.formatOptions.id, this.formatOptions);
     }
+
+    shouldFlush(): boolean {
+        return false;
+    }
 }

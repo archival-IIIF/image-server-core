@@ -15,7 +15,8 @@ export default class RegionRequest implements ImageRequest {
     private static REGION_IN_PERCENTAGES =
         /^pct:([0-9]+\.?[0-9]*),([0-9]+\.?[0-9]*),([0-9]+\.?[0-9]*),([0-9]+\.?[0-9]*)$/;
 
-    constructor(private request: string) { }
+    constructor(private request: string) {
+    }
 
     parseImageRequest(size: Size): void {
         if (this.request === 'full') {
@@ -86,5 +87,9 @@ export default class RegionRequest implements ImageRequest {
             else
                 image.extract({left: this.left, top: this.top, width: this.width, height: this.height});
         }
+    }
+
+    shouldFlush(): boolean {
+        return this.isSquare;
     }
 }

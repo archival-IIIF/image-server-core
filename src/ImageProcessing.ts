@@ -4,6 +4,7 @@ export interface ImageRequest {
     parseImageRequest(size: Size): void;
     requiresImageProcessing(): boolean;
     executeImageProcessing(image: Sharp): void;
+    shouldFlush(): boolean;
 }
 
 export interface Size {
@@ -20,18 +21,25 @@ export default class ImageProcessing {
         const imageRequestSize = {width: size.width, height: size.height};
         this.requests.forEach(request => request.parseImageRequest(imageRequestSize));
 
-        const pipeline = this.getPipeline();
-        if (this.maxSize && (size.width === this.maxSize || size.height === this.maxSize))
+        let pipeline = this.getPipeline();
+        if (this.maxSize && (size.width === this.maxSize || size.height === this.maxSize)) {
             pipeline.resize(size.width, size.height, {fit: 'fill'});
+            pipeline = await ImageProcessing.flushPipeline(pipeline);
+        }
 
-        if (this.requests.filter(request => request.requiresImageProcessing()).length > 0)
-            this.requests.forEach(request => request.executeImageProcessing(pipeline));
+        if (this.requests.filter(request => request.requiresImageProcessing()).length > 0) {
+            for (const request of this.requests) {
+                request.executeImageProcessing(pipeline);
+                if (request.shouldFlush())
+                    pipeline = await ImageProcessing.flushPipeline(pipeline);
+            }
+        }
 
         return pipeline.toBuffer({resolveWithObject: true});
     }
 
     private getPipeline(): Sharp {
-        return sharp(this.path);
+        return sharp(this.path, {failOn: 'none'});
     }
 
     private async getSize(): Promise<Size> {
@@ -48,5 +56,10 @@ export default class ImageProcessing {
             return {width: Math.round(width * (this.maxSize / height)), height: this.maxSize};
 
         return {width, height};
+    }
+
+    private static async flushPipeline(pipeline: Sharp): Promise<Sharp> {
+        const {data, info} = await pipeline.raw().toBuffer({resolveWithObject: true});
+        return sharp(data, {raw: info, failOn: 'none'});
     }
 }

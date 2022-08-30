@@ -12,7 +12,7 @@ export default class RotateRequest implements ImageRequest {
     parseImageRequest(size: Size): void {
         let request = this.request;
         if (request.startsWith('!')) {
-            request = request.substr(1);
+            request = request.substring(1);
             this.isMirrored = true;
         }
 
@@ -32,5 +32,9 @@ export default class RotateRequest implements ImageRequest {
     executeImageProcessing(image: Sharp): void {
         if (this.isMirrored) image.flop();
         if (this.degrees > 0) image.rotate(this.degrees);
+    }
+
+    shouldFlush(): boolean {
+        return false;
     }
 }

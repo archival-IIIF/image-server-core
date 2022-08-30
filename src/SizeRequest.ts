@@ -102,4 +102,8 @@ export default class SizeRequest implements ImageRequest {
             image.resize(this.newSize.width, this.newSize.height, {fit});
         }
     }
+
+    shouldFlush(): boolean {
+        return false;
+    }
 }

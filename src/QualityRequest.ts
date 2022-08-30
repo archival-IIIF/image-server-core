@@ -33,4 +33,8 @@ export default class QualityRequest implements ImageRequest {
         else if (this.request === 'bitonal')
             image.threshold();
     }
+
+    shouldFlush(): boolean {
+        return false;
+    }
 }
