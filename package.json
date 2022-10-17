@@ -1,6 +1,6 @@
 {
   "name": "@archival-iiif/image-server-core",
-  "version": "2.0.4",
+  "version": "2.0.6",
   "license": "MIT",
   "main": "dist/index.js",
   "files": [
@@ -8,14 +8,14 @@
   ],
   "types": "dist/index.d.ts",
   "dependencies": {
-    "sharp": "0.30.7",
-    "@types/sharp": "0.30.5"
+    "sharp": "0.31.1",
+    "@types/sharp": "0.31.0"
   },
   "devDependencies": {
-    "typescript": "4.7.4",
-    "mocha": "10.0.0",
-    "@types/mocha": "9.1.1",
-    "sinon": "14.0.0",
+    "typescript": "4.8.4",
+    "mocha": "10.1.0",
+    "@types/mocha": "10.0.0",
+    "sinon": "14.0.1",
     "@types/sinon": "10.0.13",
     "chai": "4.3.6",
     "@types/chai": "4.3.3",

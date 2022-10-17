@@ -1,4 +1,4 @@
-import sharp, {Sharp} from 'sharp';
+import sharp, {Sharp, SharpOptions} from 'sharp';
 
 export interface ImageRequest {
     parseImageRequest(size: Size): void;
@@ -39,7 +39,7 @@ export default class ImageProcessing {
     }
 
     private getPipeline(): Sharp {
-        return sharp(this.path, {failOn: 'none'});
+        return ImageProcessing.getPipelineFor(this.path);
     }
 
     private async getSize(): Promise<Size> {
@@ -60,6 +60,14 @@ export default class ImageProcessing {
 
     private static async flushPipeline(pipeline: Sharp): Promise<Sharp> {
         const {data, info} = await pipeline.raw().toBuffer({resolveWithObject: true});
-        return sharp(data, {raw: info, failOn: 'none'});
+        return ImageProcessing.getPipelineFor(data, {raw: info});
+    }
+
+    private static getPipelineFor(input: string | Buffer, options?: SharpOptions): Sharp {
+        return sharp(input, {
+            ...options,
+            failOn: 'none',
+            limitInputPixels: false
+        });
     }
 }
