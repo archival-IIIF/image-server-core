@@ -1,6 +1,6 @@
 import * as sinon from 'sinon';
 import {expect} from 'chai';
-import * as sharp from 'sharp';
+import sharp from 'sharp';
 
 import QualityRequest from '../src/QualityRequest';
 import {RequestError} from '../src/errors';
