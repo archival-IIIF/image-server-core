@@ -1,0 +1,8 @@
+.idea
+node_modules
+dist
+.env
+*.iml
+*.log
+*.js
+*.map

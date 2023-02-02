@@ -1,14 +1,17 @@
 {
   "compilerOptions": {
     "strict": true,
-    "target": "es2021",
-    "module": "commonjs",
+    "target": "ES2022",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "moduleDetection": "force",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "sourceMap": true,
     "outDir": "./dist",
-    "declaration": true,
-    "esModuleInterop": true
+    "declaration": true
   },
   "include": [
     "./src/**/*",

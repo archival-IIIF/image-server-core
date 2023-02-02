@@ -1,6 +1,6 @@
 {
   "name": "@archival-iiif/image-server-core",
-  "version": "2.0.8",
+  "version": "2.1.0",
   "license": "MIT",
   "main": "dist/index.js",
   "files": [
@@ -12,7 +12,7 @@
     "@types/sharp": "0.31.1"
   },
   "devDependencies": {
-    "typescript": "4.9.4",
+    "typescript": "4.9.5",
     "mocha": "10.2.0",
     "@types/mocha": "10.0.1",
     "sinon": "15.0.1",
@@ -21,13 +21,16 @@
     "@types/chai": "4.3.4",
     "sinon-chai": "3.7.0",
     "@types/sinon-chai": "3.2.9",
+    "nodemon": "2.0.20",
     "ts-node": "10.9.1"
   },
   "scripts": {
     "build": "tsc",
-    "test": "mocha -r ts-node/register test/**/*.ts"
+    "test": "mocha -r ts-node/register test/**/*.ts",
+    "start": "ts-node ./src/web.ts",
+    "watch": "nodemon --watch \"src/**/*\" -e ts,tsx --exec ts-node \"./src/web.ts\" --"
   },
-  "description": "Core functions to build an iiif image server.",
+  "description": "Core functions to build a IIIF image server and a ready-to-go image server.",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/archival-IIIF/image-server-core.git"
