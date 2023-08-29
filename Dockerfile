@@ -12,7 +12,7 @@ WORKDIR /opt/iiif-image
 RUN npm install --omit=dev
 
 # Transpile the application
-RUN tsc
+RUN npm run build
 
 # Create the actual image
 FROM node:18-alpine

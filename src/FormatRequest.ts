@@ -17,8 +17,6 @@ type OutputFormatOption =
     & { id: keyof FormatEnum };
 
 export default class FormatRequest implements ImageRequest {
-    private formatOptions: OutputFormatOption = FormatRequest.OUTPUT_FORMATS.jpg;
-
     private static OUTPUT_FORMATS: { [name: string]: OutputFormatOption } = {
         jpg: {
             id: 'jpeg',
@@ -47,6 +45,8 @@ export default class FormatRequest implements ImageRequest {
             quality: 80
         }
     };
+
+    private formatOptions: OutputFormatOption = FormatRequest.OUTPUT_FORMATS.jpg;
 
     constructor(private request: string) {
     }
