@@ -5,7 +5,7 @@
 <h1 align="center">Archival IIIF image core</h1>
 
 <div align="center">
-Archival IIIF image core provides the core functions to build a IIIF image server, but also provides a server ready-to-go.
+Archival IIIF image core provides the core functionality to build a IIIF image server, but also provides a server ready-to-go.
 </div>
 
 ## Web API
