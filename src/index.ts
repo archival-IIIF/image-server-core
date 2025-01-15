@@ -1,11 +1,11 @@
-import FormatRequest from './FormatRequest';
-import ImageProcessing from './ImageProcessing';
-import QualityRequest from './QualityRequest';
-import RegionRequest from './RegionRequest';
-import RotateRequest from './RotateRequest';
-import SizeRequest from './SizeRequest';
-import serveImage from './imageServer';
-import {RequestError, NotImplementedError} from './errors';
+import FormatRequest from './FormatRequest.js';
+import ImageProcessing from './ImageProcessing.js';
+import QualityRequest from './QualityRequest.js';
+import RegionRequest from './RegionRequest.js';
+import RotateRequest from './RotateRequest.js';
+import SizeRequest from './SizeRequest.js';
+import serveImage from './imageServer.js';
+import {RequestError, NotImplementedError} from './errors.js';
 
 export {
     FormatRequest,

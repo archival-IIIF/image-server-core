@@ -1,52 +1,9 @@
-import {Size, ImageRequest} from './ImageProcessing';
-import {NotImplementedError, RequestError} from './errors';
-import {
-    AvifOptions,
-    FormatEnum,
-    HeifOptions,
-    JpegOptions,
-    OutputOptions,
-    PngOptions,
-    Sharp,
-    TiffOptions,
-    WebpOptions
-} from 'sharp';
-
-type OutputFormatOption =
-    (OutputOptions | JpegOptions | PngOptions | WebpOptions | TiffOptions | AvifOptions | HeifOptions)
-    & { id: keyof FormatEnum };
+import {Size, ImageRequest} from './ImageProcessing.js';
+import {NotImplementedError, RequestError} from './errors.js';
+import {Sharp, FormatEnum} from 'sharp';
 
 export default class FormatRequest implements ImageRequest {
-    private static OUTPUT_FORMATS: { [name: string]: OutputFormatOption } = {
-        jpg: {
-            id: 'jpeg',
-            quality: 80,
-            progressive: false
-        },
-        png: {
-            id: 'png',
-            compressionLevel: 6,
-            progressive: false
-        },
-        webp: {
-            id: 'webp',
-            quality: 80
-        },
-        tif: {
-            id: 'tiff',
-            quality: 80
-        },
-        avif: {
-            id: 'avif',
-            quality: 80
-        },
-        heif: {
-            id: 'heif',
-            quality: 80
-        }
-    };
-
-    private formatOptions: OutputFormatOption = FormatRequest.OUTPUT_FORMATS.jpg;
+    private id: keyof FormatEnum = 'jpg';
 
     constructor(private request: string) {
     }
@@ -59,7 +16,7 @@ export default class FormatRequest implements ImageRequest {
             case 'tif':
             case 'avif':
             case 'heif':
-                this.formatOptions = FormatRequest.OUTPUT_FORMATS[this.request];
+                this.id = this.request;
                 break;
             case 'gif':
             case 'jp2':
@@ -71,11 +28,11 @@ export default class FormatRequest implements ImageRequest {
     }
 
     requiresImageProcessing(): boolean {
-        return (this.formatOptions !== undefined && this.formatOptions !== null);
+        return true;
     }
 
     executeImageProcessing(image: Sharp): void {
-        if (this.requiresImageProcessing()) image.toFormat(this.formatOptions.id, this.formatOptions);
+        if (this.requiresImageProcessing()) image.toFormat(this.id, {quality: 80});
     }
 
     shouldFlush(): boolean {

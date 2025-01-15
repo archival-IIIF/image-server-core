@@ -22,7 +22,7 @@ E.g. http://localhost:3333/example.jpg/full/!100,100/0/default.jpg
 ## Installation
 
 1. Install
-    * [Node.js 18.x LTS](https://nodejs.org/en)
+    * [Node.js 22.x LTS](https://nodejs.org/en)
     * [yarn](https://yarnpkg.com) or [npm](https://www.npmjs.com)
 2. Install dependencies
    ```sh

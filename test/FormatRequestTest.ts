@@ -2,8 +2,8 @@ import * as sinon from 'sinon';
 import {expect} from 'chai';
 import sharp from 'sharp';
 
-import FormatRequest from '../src/FormatRequest';
-import {NotImplementedError, RequestError} from '../src/errors';
+import FormatRequest from '../src/FormatRequest.js';
+import {NotImplementedError, RequestError} from '../src/errors.js';
 
 describe('FormatRequest', () => {
     const size = {width: 200, height: 100};
@@ -77,19 +77,14 @@ describe('FormatRequest', () => {
             imageMock.restore();
         });
 
-        [
-            {request: 'jpg', id: 'jpeg'},
-            {request: 'png', id: 'png'},
-            {request: 'webp', id: 'webp'},
-            {request: 'tif', id: 'tiff'}
-        ].forEach((testCase) => {
-            it(`should execute the operation correctly for ${testCase.request}`, () => {
+        ['jpg', 'png', 'webp', 'tif'].forEach(request => {
+            it(`should execute the operation correctly for ${request}`, () => {
                 imageMock
                     .expects('toFormat')
                     .once()
-                    .withArgs(testCase.id);
+                    .withArgs(request);
 
-                const formatRequest = new FormatRequest(testCase.request);
+                const formatRequest = new FormatRequest(request);
                 formatRequest.parseImageRequest(size);
                 formatRequest.executeImageProcessing(image);
 

@@ -1,5 +1,5 @@
-import {Size, ImageRequest} from './ImageProcessing';
-import {RequestError} from './errors';
+import {Size, ImageRequest} from './ImageProcessing.js';
+import {RequestError} from './errors.js';
 import {Sharp} from 'sharp';
 
 export default class SizeRequest implements ImageRequest {

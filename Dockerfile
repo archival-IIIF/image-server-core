@@ -1,4 +1,4 @@
-FROM node:20-alpine AS builder
+FROM node:22-alpine AS builder
 
 # Install global NPM tooling
 RUN npm install typescript -g
@@ -15,7 +15,7 @@ RUN npm install --omit=dev
 RUN npm run build
 
 # Create the actual image
-FROM node:20-alpine
+FROM node:22-alpine
 
 # Copy application build from builder
 COPY --from=builder /opt/ /opt/
