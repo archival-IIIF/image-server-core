@@ -1,8 +1,10 @@
-import {Size, ImageRequest} from './ImageProcessing.js';
-import {RequestError} from './errors.js';
-import {Sharp} from 'sharp';
+import {RequestError} from './errors.ts';
+
+import type {Sharp} from 'sharp';
+import type {Size, ImageRequest} from './ImageProcessing.ts';
 
 export default class SizeRequest implements ImageRequest {
+    private readonly request: string;
     private newSize: { width: number | null, height: number | null } = {width: null, height: null};
     private bestFit = false;
     private isMax = false;
@@ -13,7 +15,8 @@ export default class SizeRequest implements ImageRequest {
     private static SIZE_TO_WIDTH_HEIGHT = /^([0-9]+),([0-9]+)$/;
     private static SIZE_TO_BEST_FIT = /^!([0-9]+),([0-9]+)$/;
 
-    constructor(private request: string) {
+    constructor(request: string) {
+        this.request = request;
     }
 
     parseImageRequest(size: Size): void {

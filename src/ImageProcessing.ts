@@ -1,4 +1,5 @@
-import sharp, {Sharp, SharpOptions} from 'sharp';
+import sharp from 'sharp';
+import type {Sharp, SharpOptions} from 'sharp';
 
 export interface ImageRequest {
     parseImageRequest(size: Size): void;
@@ -13,7 +14,14 @@ export interface Size {
 }
 
 export default class ImageProcessing {
-    constructor(private path: string, private maxSize: number | null, private requests: ImageRequest[]) {
+    private readonly path: string;
+    private readonly maxSize: number | null;
+    private readonly requests: ImageRequest[];
+
+    constructor(path: string, maxSize: number | null, requests: ImageRequest[]) {
+        this.path = path;
+        this.maxSize = maxSize;
+        this.requests = requests;
     }
 
     async process(): Promise<{ data: Buffer, info: sharp.OutputInfo }> {

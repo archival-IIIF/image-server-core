@@ -2,8 +2,8 @@ import * as sinon from 'sinon';
 import {expect} from 'chai';
 import sharp from 'sharp';
 
-import FormatRequest from '../src/FormatRequest.js';
-import {NotImplementedError, RequestError} from '../src/errors.js';
+import FormatRequest from '../src/FormatRequest.ts';
+import {NotImplementedError, RequestError} from '../src/errors.ts';
 
 describe('FormatRequest', () => {
     const size = {width: 200, height: 100};

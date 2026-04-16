@@ -2,8 +2,8 @@ import * as sinon from 'sinon';
 import {expect} from 'chai';
 import sharp from 'sharp';
 
-import RegionRequest from '../src/RegionRequest.js';
-import {RequestError} from '../src/errors.js';
+import RegionRequest from '../src/RegionRequest.ts';
+import {RequestError} from '../src/errors.ts';
 
 describe('RegionRequest', () => {
     const getSize = (width: number, height: number) => ({width: width, height: height});

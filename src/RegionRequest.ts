@@ -1,8 +1,10 @@
-import {Size, ImageRequest} from './ImageProcessing.js';
-import {RequestError} from './errors.js';
-import {Sharp} from 'sharp';
+import {RequestError} from './errors.ts';
+
+import type {Sharp} from 'sharp';
+import type {Size, ImageRequest} from './ImageProcessing.ts';
 
 export default class RegionRequest implements ImageRequest {
+    private readonly request: string;
     private left: number = 0;
     private top: number = 0;
     private width: number = 0;
@@ -15,7 +17,8 @@ export default class RegionRequest implements ImageRequest {
     private static REGION_IN_PERCENTAGES =
         /^pct:([0-9]+\.?[0-9]*),([0-9]+\.?[0-9]*),([0-9]+\.?[0-9]*),([0-9]+\.?[0-9]*)$/;
 
-    constructor(private request: string) {
+    constructor(request: string) {
+        this.request = request;
     }
 
     parseImageRequest(size: Size): void {

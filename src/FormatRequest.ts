@@ -1,11 +1,14 @@
-import {Size, ImageRequest} from './ImageProcessing.js';
-import {NotImplementedError, RequestError} from './errors.js';
-import {Sharp, FormatEnum} from 'sharp';
+import {NotImplementedError, RequestError} from './errors.ts';
+
+import type {Sharp, FormatEnum} from 'sharp';
+import type {Size, ImageRequest} from './ImageProcessing.ts';
 
 export default class FormatRequest implements ImageRequest {
+    private readonly request: string;
     private id: keyof FormatEnum = 'jpg';
 
-    constructor(private request: string) {
+    constructor(request: string) {
+        this.request = request;
     }
 
     parseImageRequest(size: Size): void {

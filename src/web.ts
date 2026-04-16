@@ -1,11 +1,13 @@
 import sharp from 'sharp';
 import {join} from 'node:path';
 import {parseArgs} from 'node:util';
-import {parse, UrlWithParsedQuery} from 'node:url';
+import {parse} from 'node:url';
 import {createServer, ServerResponse} from 'node:http';
 
-import serveImage from './imageServer.js';
-import {NotImplementedError, RequestError} from './errors.js';
+import type {UrlWithParsedQuery} from 'node:url';
+
+import serveImage from './imageServer.ts';
+import {NotImplementedError, RequestError} from './errors.ts';
 
 const {values: {debug, port, root, concurrency}} = parseArgs({
     options: {

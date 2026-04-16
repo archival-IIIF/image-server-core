@@ -1,12 +1,15 @@
-import {Size, ImageRequest} from './ImageProcessing.js';
-import {RequestError} from './errors.js';
-import {Sharp} from 'sharp';
+import {RequestError} from './errors.ts';
+
+import type {Sharp} from 'sharp';
+import type {Size, ImageRequest} from './ImageProcessing.ts';
 
 export default class RotateRequest implements ImageRequest {
+    private readonly request: string;
     private degrees: number = 0;
     private isMirrored: boolean = false;
 
-    constructor(private request: string) {
+    constructor(request: string) {
+        this.request = request;
     }
 
     parseImageRequest(size: Size): void {

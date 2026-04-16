@@ -1,9 +1,9 @@
-import ImageProcessing from './ImageProcessing.js';
-import RegionRequest from './RegionRequest.js';
-import SizeRequest from './SizeRequest.js';
-import RotateRequest from './RotateRequest.js';
-import QualityRequest from './QualityRequest.js';
-import FormatRequest from './FormatRequest.js';
+import ImageProcessing from './ImageProcessing.ts';
+import RegionRequest from './RegionRequest.ts';
+import SizeRequest from './SizeRequest.ts';
+import RotateRequest from './RotateRequest.ts';
+import QualityRequest from './QualityRequest.ts';
+import FormatRequest from './FormatRequest.ts';
 
 export interface ImageOptions {
     region: string,

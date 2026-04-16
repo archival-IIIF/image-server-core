@@ -2,8 +2,8 @@ import * as sinon from 'sinon';
 import {expect} from 'chai';
 import sharp from 'sharp';
 
-import SizeRequest from '../src/SizeRequest.js';
-import {RequestError} from '../src/errors.js';
+import SizeRequest from '../src/SizeRequest.ts';
+import {RequestError} from '../src/errors.ts';
 
 describe('SizeRequest', () => {
     const getSize = (width: number, height: number) => ({width: width, height: height});
