@@ -1,13 +1,18 @@
 import {RequestError} from './errors.ts';
 
-import type {Sharp} from 'sharp';
+import type {Sharp, FitEnum} from 'sharp';
 import type {Size, ImageRequest} from './ImageProcessing.ts';
 
 export default class SizeRequest implements ImageRequest {
     private readonly request: string;
-    private newSize: { width: number | null, height: number | null } = {width: null, height: null};
+    private size: Size = {width: 0, height: 0};
+
+    private width: number | null = null;
+    private height: number | null = null;
     private bestFit = false;
     private isMax = false;
+    private resolvedSize?: Size;
+    private sourceSize?: Size;
 
     private static SIZE_TO_WIDTH = /^([0-9]+),$/;
     private static SIZE_TO_HEIGHT = /^,([0-9]+)$/;
@@ -19,90 +24,86 @@ export default class SizeRequest implements ImageRequest {
         this.request = request;
     }
 
-    parseImageRequest(size: Size): void {
-        if (this.request === 'full' || this.request === 'max')
+    setSize(size: Size): void {
+        this.size = size;
+    }
+
+    setSourceSize(size: Size): void {
+        this.sourceSize = size;
+    }
+
+    getNewSize(): Size {
+        return this.resolvedSize ?? this.size;
+    }
+
+    parseImageRequest(): void {
+        if (this.request === 'full' || this.request === 'max') {
             this.isMax = true;
-        else {
+        } else {
             let result;
             if ((result = SizeRequest.SIZE_TO_WIDTH.exec(this.request)) !== null) {
-                [, this.newSize.width] = result.map(i => parseInt(i));
-                this.isMax = (this.newSize.width === size.width);
-            }
-            else if ((result = SizeRequest.SIZE_TO_HEIGHT.exec(this.request)) !== null) {
-                [, this.newSize.height] = result.map(i => parseInt(i));
-                this.isMax = (this.newSize.height === size.height);
-            }
-            else if ((result = SizeRequest.SIZE_TO_PERCENTAGE.exec(this.request)) !== null) {
-                [, this.newSize.width] = result.map(i => Math.round((size.width / 100) * parseFloat(i)));
-                this.isMax = (this.newSize.width === size.width);
-            }
-            else if ((result = SizeRequest.SIZE_TO_WIDTH_HEIGHT.exec(this.request)) !== null) {
-                [, this.newSize.width, this.newSize.height] = result.map(i => parseInt(i));
-                this.isMax = (this.newSize.width === size.width) && (this.newSize.height === size.height);
-            }
-            else if ((result = SizeRequest.SIZE_TO_BEST_FIT.exec(this.request)) !== null) {
-                [, this.newSize.width, this.newSize.height] = result.map(i => parseInt(i));
-                const isMaxWidth = (size.width > size.height) && (size.width === this.newSize.width);
-                const isMaxHeight = (size.height > size.width) && (size.height === this.newSize.height);
+                [, this.width] = result.map(i => parseInt(i));
+                this.isMax = (this.width === this.size.width);
+            } else if ((result = SizeRequest.SIZE_TO_HEIGHT.exec(this.request)) !== null) {
+                [, this.height] = result.map(i => parseInt(i));
+                this.isMax = (this.height === this.size.height);
+            } else if ((result = SizeRequest.SIZE_TO_PERCENTAGE.exec(this.request)) !== null) {
+                [, this.width] = result.map(i => Math.round((this.size.width / 100) * parseFloat(i)));
+                this.isMax = (this.width === this.size.width);
+            } else if ((result = SizeRequest.SIZE_TO_WIDTH_HEIGHT.exec(this.request)) !== null) {
+                [, this.width, this.height] = result.map(i => parseInt(i));
+                this.isMax = (this.width === this.size.width) && (this.height === this.size.height);
+            } else if ((result = SizeRequest.SIZE_TO_BEST_FIT.exec(this.request)) !== null) {
+                [, this.width, this.height] = result.map(i => parseInt(i));
+                const isMaxWidth = (this.size.width > this.size.height) &&
+                    (this.size.width === this.width);
+                const isMaxHeight = (this.size.height > this.size.width) &&
+                    (this.size.height === this.height);
                 this.isMax = isMaxWidth || isMaxHeight;
                 this.bestFit = true;
-            }
-            else
+            } else
                 throw new RequestError(`Incorrect region request: ${this.request}`);
 
-            if ((this.newSize.width === 0) || (this.newSize.height === 0))
+            if ((this.width === 0) || (this.height === 0))
                 throw new RequestError('Size width and/or height should not be zero');
         }
 
-        this.updateProcessingInfo(size);
+        this.resolvedSize = this.resolveSize();
+        this.isMax = this.resolvedSize.width === this.size.width && this.resolvedSize.height === this.size.height;
     }
 
-    private updateProcessingInfo(size: Size): void {
-        if (this.isMax)
-            return;
-        let width = size.width;
-        let height = size.height;
+    private resolveSize(): Size {
+        if (this.width && this.height && this.bestFit) {
+            const newWidth = Math.round(this.size.width * this.height / this.size.height);
+            const newHeight = Math.round(this.size.height * this.width / this.size.width);
 
-        if (this.newSize.width && this.newSize.height && this.bestFit) {
-            const newWidth = Math.round(width * this.newSize.height / height);
-            const newHeight = Math.round(height * this.newSize.width / width);
+            if (newWidth < this.width)
+                return {width: newWidth, height: Math.round(this.size.height * newWidth / this.size.width)};
 
-            if (newWidth < this.newSize.width) {
-                height = Math.round(height * newWidth / width);
-                width = newWidth;
-            }
-            else {
-                width = Math.round(width * newHeight / height);
-                height = newHeight;
-            }
-        }
-        else if (this.newSize.width && this.newSize.height) {
-            width = this.newSize.width;
-            height = this.newSize.height;
-        }
-        else if (this.newSize.width && !this.newSize.height) {
-            height = Math.round(height * this.newSize.width / width);
-            width = this.newSize.width;
-        }
-        else if (this.newSize.height && !this.newSize.width) {
-            width = Math.round(width * this.newSize.height / height);
-            height = this.newSize.height;
+            return {width: Math.round(this.size.width * newHeight / this.size.height), height: newHeight};
         }
 
-        size.width = width;
-        size.height = height;
-    }
+        if (this.width && this.height)
+            return {width: this.width, height: this.height};
 
-    requiresImageProcessing(): boolean {
-        return !this.isMax;
+        if (this.width && !this.height)
+            return {width: this.width, height: Math.round(this.size.height * this.width / this.size.width)};
+
+        if (this.height && !this.width)
+            return {width: Math.round(this.size.width * this.height / this.size.height), height: this.height};
+
+        return this.size;
     }
 
     executeImageProcessing(image: Sharp): void {
-        if (this.requiresImageProcessing()) {
-            let fit: 'contain' | 'inside' | 'fill' = 'contain';
-            if (this.newSize.width && this.newSize.height) fit = 'fill';
+        if (!this.isMax) {
+            let fit: keyof FitEnum = 'contain';
+            if (this.width && this.height) fit = 'fill';
             if (this.bestFit) fit = 'inside';
-            image.resize(this.newSize.width, this.newSize.height, {fit});
+            image.resize(this.width, this.height, {fit});
+        } else if (this.sourceSize && this.resolvedSize &&
+            (this.sourceSize.width !== this.resolvedSize.width || this.sourceSize.height !== this.resolvedSize.height)) {
+            image.resize(this.resolvedSize.width, this.resolvedSize.height, {fit: 'fill'});
         }
     }
 

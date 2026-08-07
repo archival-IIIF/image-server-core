@@ -6,8 +6,6 @@ import RotateRequest from '../src/RotateRequest.ts';
 import {RequestError} from '../src/errors.ts';
 
 describe('RotateRequest', () => {
-    const size = {width: 200, height: 100};
-
     describe('#parseImageRequest()', () => {
         [
             '0',
@@ -20,7 +18,7 @@ describe('RotateRequest', () => {
             it(`should not throw an error for ${request}`, () => {
                 const rotateRequest = new RotateRequest(request);
                 expect(() => {
-                    rotateRequest.parseImageRequest(size);
+                    rotateRequest.parseImageRequest();
                 }).to.not.throw();
             });
         });
@@ -35,31 +33,9 @@ describe('RotateRequest', () => {
             it(`should throw a request error for ${request}`, () => {
                 const rotateRequest = new RotateRequest(request);
                 expect(() => {
-                    rotateRequest.parseImageRequest(size);
+                    rotateRequest.parseImageRequest();
                 }).to.throw(RequestError);
             });
-        });
-    });
-
-    describe('#requiresImageProcessing()', () => {
-        [
-            '!0',
-            '180',
-            '!45',
-            '30.5',
-            '!44.34',
-        ].forEach((request) => {
-            it(`should require operation in case of ${request}`, () => {
-                const rotateRequest = new RotateRequest(request);
-                rotateRequest.parseImageRequest(size);
-                expect(rotateRequest.requiresImageProcessing()).to.be.true;
-            });
-        });
-
-        it('should not require operation in case of 0', () => {
-            const rotateRequest = new RotateRequest('0');
-            rotateRequest.parseImageRequest(size);
-            expect(rotateRequest.requiresImageProcessing()).to.be.false;
         });
     });
 
@@ -81,7 +57,7 @@ describe('RotateRequest', () => {
                 .never();
 
             const rotateRequest = new RotateRequest('0');
-            rotateRequest.parseImageRequest(size);
+            rotateRequest.parseImageRequest();
             rotateRequest.executeImageProcessing(image);
 
             imageMock.verify();
@@ -100,7 +76,7 @@ describe('RotateRequest', () => {
                     .withArgs(testCase.rotate);
 
                 const rotateRequest = new RotateRequest(testCase.request);
-                rotateRequest.parseImageRequest(size);
+                rotateRequest.parseImageRequest();
                 rotateRequest.executeImageProcessing(image);
 
                 imageMock.verify();
@@ -118,7 +94,7 @@ describe('RotateRequest', () => {
                     .never();
 
                 const rotateRequest = new RotateRequest(request);
-                rotateRequest.parseImageRequest(size);
+                rotateRequest.parseImageRequest();
                 rotateRequest.executeImageProcessing(image);
 
                 imageMock.verify();
@@ -136,7 +112,7 @@ describe('RotateRequest', () => {
                     .once();
 
                 const rotateRequest = new RotateRequest(request);
-                rotateRequest.parseImageRequest(size);
+                rotateRequest.parseImageRequest();
                 rotateRequest.executeImageProcessing(image);
 
                 imageMock.verify();

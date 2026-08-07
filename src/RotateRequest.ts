@@ -5,6 +5,7 @@ import type {Size, ImageRequest} from './ImageProcessing.ts';
 
 export default class RotateRequest implements ImageRequest {
     private readonly request: string;
+
     private degrees: number = 0;
     private isMirrored: boolean = false;
 
@@ -12,7 +13,7 @@ export default class RotateRequest implements ImageRequest {
         this.request = request;
     }
 
-    parseImageRequest(size: Size): void {
+    parseImageRequest(): void {
         let request = this.request;
         if (request.startsWith('!')) {
             request = request.substring(1);
@@ -26,10 +27,6 @@ export default class RotateRequest implements ImageRequest {
         this.degrees = Math.round(this.degrees);
         if ((this.degrees < 0) || (this.degrees >= 360))
             throw new RequestError('Degrees should be between 0 and 360');
-    }
-
-    requiresImageProcessing(): boolean {
-        return this.isMirrored || (this.degrees > 0);
     }
 
     executeImageProcessing(image: Sharp): void {

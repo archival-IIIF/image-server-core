@@ -1,23 +1,32 @@
 import {NotImplementedError, RequestError} from './errors.ts';
 
-import type {Sharp, FormatEnum} from 'sharp';
-import type {Size, ImageRequest} from './ImageProcessing.ts';
+import type {Sharp, FormatEnum, HeifOptions, OutputOptions} from 'sharp';
+import type {ImageRequest} from './ImageProcessing.ts';
 
 export default class FormatRequest implements ImageRequest {
     private readonly request: string;
-    private id: keyof FormatEnum = 'jpg';
+
+    private id: keyof FormatEnum = 'jpeg';
+    private formatOptions: OutputOptions = {};
 
     constructor(request: string) {
         this.request = request;
     }
 
-    parseImageRequest(size: Size): void {
+    parseImageRequest(): void {
         switch (this.request) {
             case 'jpg':
+                this.id = 'jpeg';
+                break;
+            case 'tif':
+                this.id = 'tiff';
+                break;
             case 'png':
             case 'webp':
-            case 'tif':
             case 'avif':
+                this.id = 'heif';
+                this.formatOptions = {compression: 'av1'} as HeifOptions;
+                break;
             case 'heif':
                 this.id = this.request;
                 break;
@@ -30,12 +39,8 @@ export default class FormatRequest implements ImageRequest {
         }
     }
 
-    requiresImageProcessing(): boolean {
-        return true;
-    }
-
     executeImageProcessing(image: Sharp): void {
-        if (this.requiresImageProcessing()) image.toFormat(this.id, {quality: 80});
+        image.toFormat(this.id, {quality: 80, ...this.formatOptions});
     }
 
     shouldFlush(): boolean {

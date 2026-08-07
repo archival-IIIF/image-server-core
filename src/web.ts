@@ -1,10 +1,8 @@
 import sharp from 'sharp';
 import {join} from 'node:path';
 import {parseArgs} from 'node:util';
-import {parse} from 'node:url';
+import {URL} from 'node:url';
 import {createServer, ServerResponse} from 'node:http';
-
-import type {UrlWithParsedQuery} from 'node:url';
 
 import serveImage from './imageServer.ts';
 import {NotImplementedError, RequestError} from './errors.ts';
@@ -56,7 +54,7 @@ console.log(`Available image output formats: ${(Object.values(sharp.format))
 
 console.log(`Number of image processing threads: ${sharp.concurrency()}`);
 
-async function requestImage(parsedUrl: UrlWithParsedQuery, parts: string[], res: ServerResponse) {
+async function requestImage(parsedUrl: URL, parts: string[], res: ServerResponse) {
     const imagePath = decodeURIComponent(parts[0]);
     const region = parts[1];
     const size = parts[2];
@@ -67,11 +65,10 @@ async function requestImage(parsedUrl: UrlWithParsedQuery, parts: string[], res:
     debug && console.log(`Received a request for an image on path ${imagePath}`);
 
     const path = join(root as string, imagePath);
-    const maxSize = Array.isArray(parsedUrl.query.max)
-        ? parseInt(parsedUrl.query.max[0])
-        : parsedUrl.query.max
-            ? parseInt(parsedUrl.query.max)
-            : null;
+    const maxValue = parsedUrl.searchParams.get('max');
+    if (maxValue !== null && (!/^\d+$/.test(maxValue) || !Number.isSafeInteger(Number(maxValue)) || Number(maxValue) <= 0))
+        throw new RequestError('max must be a finite positive integer');
+    const maxSize = maxValue !== null ? Number(maxValue) : null;
 
     const image = await serveImage(path, maxSize, {region, size, rotation, quality, format});
 
@@ -86,32 +83,26 @@ async function requestImage(parsedUrl: UrlWithParsedQuery, parts: string[], res:
 
 const server = createServer(async (req, res) => {
     try {
-        const parsedUrl = parse(req.url!, true);
-        const path = parsedUrl.pathname!;
-        const parts = path.substring(1).split('/');
+        const parsedUrl = new URL(`http:/localhost${req.url}`);
+        const parts = parsedUrl.pathname.substring(1).split('/');
 
         if (parts.length === 5 && parts[4].indexOf('.') >= 0) {
             await requestImage(parsedUrl, parts, res);
-        }
-        else if (parts.length === 1) {
+        } else if (parts.length === 1 && parts[0].trim().length > 0) {
             res.writeHead(302, {'Location': parsedUrl.pathname! + '/info.json'});
             res.end();
-        }
-        else {
+        } else {
             res.writeHead(404);
             res.end();
         }
-    }
-    catch (err: any) {
+    } catch (err: any) {
         if (err instanceof RequestError) {
             res.writeHead(400, err.message);
             res.end();
-        }
-        else if (err instanceof NotImplementedError) {
+        } else if (err instanceof NotImplementedError) {
             res.writeHead(501, err.message);
             res.end();
-        }
-        else {
+        } else {
             console.error(`${err.status || 500} - ${req.method} - ${req.url} - ${err.message}`, {err});
             res.writeHead(500, 'Internal Server Error');
             res.end();

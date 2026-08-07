@@ -1,33 +1,18 @@
 import {RequestError} from './errors.ts';
 
 import type {Sharp} from 'sharp';
-import type {Size, ImageRequest} from './ImageProcessing.ts';
+import type {ImageRequest} from './ImageProcessing.ts';
 
 export default class QualityRequest implements ImageRequest {
     private readonly request: string;
-    private setQuality: boolean = false;
 
     constructor(request: string) {
         this.request = request;
     }
 
-    parseImageRequest(size: Size): void {
-        switch (this.request) {
-            case 'color':
-            case 'default':
-                this.setQuality = false;
-                break;
-            case 'gray':
-            case 'bitonal':
-                this.setQuality = true;
-                break;
-            default:
-                throw new RequestError(`Incorrect quality request: ${this.request}`);
-        }
-    }
-
-    requiresImageProcessing(): boolean {
-        return this.setQuality;
+    parseImageRequest(): void {
+        if (!['color', 'default', 'gray', 'bitonal'].includes(this.request))
+            throw new RequestError(`Incorrect quality request: ${this.request}`);
     }
 
     executeImageProcessing(image: Sharp): void {

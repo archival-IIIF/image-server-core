@@ -6,8 +6,6 @@ import FormatRequest from '../src/FormatRequest.ts';
 import {NotImplementedError, RequestError} from '../src/errors.ts';
 
 describe('FormatRequest', () => {
-    const size = {width: 200, height: 100};
-
     describe('#parseImageRequest()', () => {
         [
             'jpg',
@@ -18,7 +16,7 @@ describe('FormatRequest', () => {
             it(`should not throw an error for ${request}`, () => {
                 const formatRequest = new FormatRequest(request);
                 expect(() => {
-                    formatRequest.parseImageRequest(size);
+                    formatRequest.parseImageRequest();
                 }).to.not.throw();
             });
         });
@@ -31,7 +29,7 @@ describe('FormatRequest', () => {
             it(`should throw a request error for ${request}`, () => {
                 const formatRequest = new FormatRequest(request);
                 expect(() => {
-                    formatRequest.parseImageRequest(size);
+                    formatRequest.parseImageRequest();
                 }).to.throw(RequestError);
             });
         });
@@ -44,23 +42,8 @@ describe('FormatRequest', () => {
             it(`should throw a not implemented error for ${request}`, () => {
                 const formatRequest = new FormatRequest(request);
                 expect(() => {
-                    formatRequest.parseImageRequest(size);
+                    formatRequest.parseImageRequest();
                 }).to.throw(NotImplementedError);
-            });
-        });
-    });
-
-    describe('#requiresImageProcessing()', () => {
-        [
-            'jpg',
-            'png',
-            'webp',
-            'tif',
-        ].forEach((request) => {
-            it(`should always require operation in case of ${request}`, () => {
-                const formatRequest = new FormatRequest(request);
-                formatRequest.parseImageRequest(size);
-                expect(formatRequest.requiresImageProcessing()).to.be.true;
             });
         });
     });
@@ -85,7 +68,7 @@ describe('FormatRequest', () => {
                     .withArgs(request);
 
                 const formatRequest = new FormatRequest(request);
-                formatRequest.parseImageRequest(size);
+                formatRequest.parseImageRequest();
                 formatRequest.executeImageProcessing(image);
 
                 imageMock.verify();

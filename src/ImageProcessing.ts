@@ -1,11 +1,25 @@
-import sharp from 'sharp';
-import type {Sharp, SharpOptions} from 'sharp';
+import sharp, {type Sharp, type SharpOptions, type OutputInfo} from 'sharp';
+import ImageSizes from './ImageSizes.ts';
+import RegionRequest from "./RegionRequest.ts";
+import SizeRequest from "./SizeRequest.ts";
+import RotateRequest from "./RotateRequest.ts";
+import QualityRequest from "./QualityRequest.ts";
+import FormatRequest from "./FormatRequest.ts";
 
 export interface ImageRequest {
-    parseImageRequest(size: Size): void;
-    requiresImageProcessing(): boolean;
+    parseImageRequest(): void;
+
     executeImageProcessing(image: Sharp): void;
+
     shouldFlush(): boolean;
+}
+
+export interface ImageOptions {
+    region: string,
+    size: string,
+    rotation: string,
+    quality: string,
+    format: string
 }
 
 export interface Size {
@@ -15,55 +29,59 @@ export interface Size {
 
 export default class ImageProcessing {
     private readonly path: string;
-    private readonly maxSize: number | null;
-    private readonly requests: ImageRequest[];
+    private readonly sizes: ImageSizes;
 
-    constructor(path: string, maxSize: number | null, requests: ImageRequest[]) {
+    private readonly region: RegionRequest;
+    private readonly size: SizeRequest;
+    private readonly rotate: RotateRequest;
+    private readonly quality: QualityRequest;
+    private readonly format: FormatRequest;
+
+    constructor(path: string, maxSize: number | null, options: ImageOptions) {
         this.path = path;
-        this.maxSize = maxSize;
-        this.requests = requests;
+        this.sizes = new ImageSizes(path, maxSize, this);
+
+        this.region = new RegionRequest(options.region);
+        this.size = new SizeRequest(options.size);
+        this.rotate = new RotateRequest(options.rotation);
+        this.quality = new QualityRequest(options.quality);
+        this.format = new FormatRequest(options.format);
     }
 
-    async process(): Promise<{ data: Buffer, info: sharp.OutputInfo }> {
-        const size = await this.getSize();
-        const imageRequestSize = {width: size.width, height: size.height};
-        this.requests.forEach(request => request.parseImageRequest(imageRequestSize));
+    async process(): Promise<{ data: Buffer, info: OutputInfo }> {
+        await this.sizes.init();
 
-        let pipeline = this.getPipeline();
-        if (this.maxSize && (size.width === this.maxSize || size.height === this.maxSize)) {
-            pipeline.resize(size.width, size.height, {fit: 'fill'});
-            pipeline = await ImageProcessing.flushPipeline(pipeline);
-        }
+        this.region.setSize(this.sizes.getMaxSize());
+        this.region.parseImageRequest();
 
-        if (this.requests.filter(request => request.requiresImageProcessing()).length > 0) {
-            for (const request of this.requests) {
-                request.executeImageProcessing(pipeline);
-                if (request.shouldFlush())
-                    pipeline = await ImageProcessing.flushPipeline(pipeline);
-            }
+        this.size.setSize(this.region.getRegionSize());
+        this.size.parseImageRequest()
+
+        this.rotate.parseImageRequest();
+        this.quality.parseImageRequest();
+        this.format.parseImageRequest();
+
+        const level = this.sizes.getSourceLevel(this.region.getRegionSize(), this.size.getNewSize());
+        this.region.setSource(level);
+
+        const region = this.region.getRegionSize();
+        this.size.setSourceSize({
+            width: Math.ceil(region.width * level.scaleX),
+            height: Math.ceil(region.height * level.scaleY)
+        });
+
+        let pipeline = this.getPipeline(level.page);
+        for (const request of [this.region, this.size, this.rotate, this.quality, this.format]) {
+            request.executeImageProcessing(pipeline);
+            if (request.shouldFlush())
+                pipeline = await ImageProcessing.flushPipeline(pipeline);
         }
 
         return pipeline.toBuffer({resolveWithObject: true});
     }
 
-    private getPipeline(): Sharp {
-        return ImageProcessing.getPipelineFor(this.path);
-    }
-
-    private async getSize(): Promise<Size> {
-        const pipeline = this.getPipeline();
-        const metadata = await pipeline.metadata();
-
-        const width = metadata.width as number;
-        const height = metadata.height as number;
-
-        if (this.maxSize && width > height && width > this.maxSize)
-            return {width: this.maxSize, height: Math.round(height * (this.maxSize / width))};
-
-        if (this.maxSize && height > width && height > this.maxSize)
-            return {width: Math.round(width * (this.maxSize / height)), height: this.maxSize};
-
-        return {width, height};
+    getPipeline(page?: number): Sharp {
+        return ImageProcessing.getPipelineFor(this.path, {page});
     }
 
     private static async flushPipeline(pipeline: Sharp): Promise<Sharp> {

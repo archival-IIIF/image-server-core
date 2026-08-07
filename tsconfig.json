@@ -7,13 +7,13 @@
     "verbatimModuleSyntax": true,
     "sourceMap": true,
     "declaration": true,
-    "rootDir": ".",
-    "outDir": "./dist",
-    "types": [
-      "mocha"
-    ]
+    "rootDir": "./src",
+    "outDir": "./dist"
   },
   "include": [
-    "./src/**/*"
+    "src"
+  ],
+  "exclude": [
+    "src/web.ts"
   ]
 }

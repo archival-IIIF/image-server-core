@@ -7,7 +7,7 @@ WORKDIR /opt/iiif-image
 # Install the application
 COPY package.json /opt/iiif-image
 COPY package-lock.json /opt/iiif-image
-RUN npm install --omit=dev
+RUN npm ci --omit=dev
 
 # Copy the application
 COPY src /opt/iiif-image/src

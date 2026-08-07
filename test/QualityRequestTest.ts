@@ -6,8 +6,6 @@ import QualityRequest from '../src/QualityRequest.ts';
 import {RequestError} from '../src/errors.ts';
 
 describe('QualityRequest', () => {
-    const size = {width: 200, height: 100};
-
     describe('#parseImageRequest()', () => {
         [
             'default',
@@ -18,7 +16,7 @@ describe('QualityRequest', () => {
             it(`should not throw an error for ${request}`, () => {
                 const qualityRequest = new QualityRequest(request);
                 expect(() => {
-                    qualityRequest.parseImageRequest(size);
+                    qualityRequest.parseImageRequest();
                 }).to.not.throw();
             });
         });
@@ -31,32 +29,8 @@ describe('QualityRequest', () => {
             it(`should throw a request error for ${request}`, () => {
                 const qualityRequest = new QualityRequest(request);
                 expect(() => {
-                    qualityRequest.parseImageRequest(size);
+                    qualityRequest.parseImageRequest();
                 }).to.throw(RequestError);
-            });
-        });
-    });
-
-    describe('#requiresImageProcessing()', () => {
-        [
-            'gray',
-            'bitonal',
-        ].forEach((request) => {
-            it(`should require operation in case of ${request}`, () => {
-                const qualityRequest = new QualityRequest(request);
-                qualityRequest.parseImageRequest(size);
-                expect(qualityRequest.requiresImageProcessing()).to.be.true;
-            });
-        });
-
-        [
-            'default',
-            'color',
-        ].forEach((request) => {
-            it(`should not require operation in case of ${request}`, () => {
-                const qualityRequest = new QualityRequest(request);
-                qualityRequest.parseImageRequest(size);
-                expect(qualityRequest.requiresImageProcessing()).to.be.false;
             });
         });
     });
@@ -84,7 +58,7 @@ describe('QualityRequest', () => {
                 .once();
 
             const qualityRequest = new QualityRequest('gray');
-            qualityRequest.parseImageRequest(size);
+            qualityRequest.parseImageRequest();
             qualityRequest.executeImageProcessing(image);
 
             imageMock.verify();
@@ -96,7 +70,7 @@ describe('QualityRequest', () => {
                 .once();
 
             const qualityRequest = new QualityRequest('bitonal');
-            qualityRequest.parseImageRequest(size);
+            qualityRequest.parseImageRequest();
             qualityRequest.executeImageProcessing(image);
 
             imageMock.verify();

@@ -6,8 +6,6 @@ import RegionRequest from '../src/RegionRequest.ts';
 import {RequestError} from '../src/errors.ts';
 
 describe('RegionRequest', () => {
-    const getSize = (width: number, height: number) => ({width: width, height: height});
-
     describe('#parseImageRequest()', () => {
         describe('having an image of 200 by 200', () => {
             const width = 200, height = 200;
@@ -25,18 +23,19 @@ describe('RegionRequest', () => {
             ].forEach((request) => {
                 it(`should not throw an error for ${request.request}`, () => {
                     const regionRequest = new RegionRequest(request.request);
+                    regionRequest.setSize(({width: width, height: height}));
                     expect(() => {
-                        regionRequest.parseImageRequest(getSize(width, height));
+                        regionRequest.parseImageRequest();
                     }).to.not.throw();
                 });
 
                 it(`should update the size of the ImageProcessingInfo object correctly for ${request.request}`, () => {
-                    const size = getSize(width, height);
                     const regionRequest = new RegionRequest(request.request);
-                    regionRequest.parseImageRequest(size);
+                    regionRequest.setSize(({width: width, height: height}));
+                    regionRequest.parseImageRequest();
 
-                    expect(size.width).to.equal(request.width);
-                    expect(size.height).to.equal(request.height);
+                    expect(regionRequest.getRegionSize().width).to.equal(request.width);
+                    expect(regionRequest.getRegionSize().height).to.equal(request.height);
                 });
             });
 
@@ -59,7 +58,7 @@ describe('RegionRequest', () => {
                 it(`should throw a request error for ${request}`, () => {
                     const regionRequest = new RegionRequest(request);
                     expect(() => {
-                        regionRequest.parseImageRequest(getSize(width, height));
+                        regionRequest.parseImageRequest();
                     }).to.throw(RequestError);
                 });
             });
@@ -69,55 +68,12 @@ describe('RegionRequest', () => {
             const width = 300, height = 100;
 
             it(`should update the size of the ImageProcessingInfo object correctly for square`, () => {
-                const size = getSize(width, height);
                 const regionRequest = new RegionRequest('square');
-                regionRequest.parseImageRequest(size);
+                regionRequest.setSize({width: width, height: height});
+                regionRequest.parseImageRequest();
 
-                expect(size.width).to.equal(100);
-                expect(size.height).to.equal(100);
-            });
-        });
-    });
-
-    describe('#requiresImageProcessing()', () => {
-        describe('having an image of 200 by 200', () => {
-            const width = 200, height = 200;
-
-            [
-                '20,20,170,170',
-                '20,20,200,200',
-                'pct:22.1,45.6,10,20.44'
-            ].forEach((request) => {
-                it(`should require operation in case of ${request}`, () => {
-                    const regionRequest = new RegionRequest(request);
-                    regionRequest.parseImageRequest(getSize(width, height));
-                    expect(regionRequest.requiresImageProcessing()).to.be.true;
-                });
-            });
-
-            [
-                'full',
-                'square',
-                '0,0,200,200',
-                'pct:0,0,100,100',
-                '0,0,210,210',
-                'pct:0,0,210,210'
-            ].forEach((request) => {
-                it(`should not require operation in case of ${request}`, () => {
-                    const regionRequest = new RegionRequest(request);
-                    regionRequest.parseImageRequest(getSize(width, height));
-                    expect(regionRequest.requiresImageProcessing()).to.be.false;
-                });
-            });
-        });
-
-        describe('having a non-square image of 300 by 100', () => {
-            const width = 300, height = 100;
-
-            it(`should require operation in case of square`, () => {
-                const regionRequest = new RegionRequest('square');
-                regionRequest.parseImageRequest(getSize(width, height));
-                expect(regionRequest.requiresImageProcessing()).to.be.true;
+                expect(regionRequest.getRegionSize().width).to.equal(100);
+                expect(regionRequest.getRegionSize().height).to.equal(100);
             });
         });
     });
@@ -151,7 +107,8 @@ describe('RegionRequest', () => {
                         .never();
 
                     const regionRequest = new RegionRequest(request);
-                    regionRequest.parseImageRequest(getSize(width, height));
+                    regionRequest.setSize(({width: width, height: height}));
+                    regionRequest.parseImageRequest();
                     regionRequest.executeImageProcessing(image);
 
                     imageMock.verify();
@@ -176,7 +133,8 @@ describe('RegionRequest', () => {
                         });
 
                     const regionRequest = new RegionRequest(testCase.request);
-                    regionRequest.parseImageRequest(getSize(width, height));
+                    regionRequest.setSize(({width: width, height: height}));
+                    regionRequest.parseImageRequest();
                     regionRequest.executeImageProcessing(image);
 
                     imageMock.verify();
@@ -195,7 +153,8 @@ describe('RegionRequest', () => {
                     .withArgs(expectedWidth, expectedHeight, {fit: 'cover', position: 'attention'});
 
                 const regionRequest = new RegionRequest('square');
-                regionRequest.parseImageRequest(getSize(width, height));
+                regionRequest.setSize(({width: width, height: height}));
+                regionRequest.parseImageRequest();
                 regionRequest.executeImageProcessing(image);
 
                 imageMock.verify();

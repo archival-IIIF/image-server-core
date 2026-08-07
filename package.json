@@ -9,21 +9,21 @@
   ],
   "types": "dist/index.d.ts",
   "dependencies": {
-    "sharp": "0.34.5",
-    "@types/node": "24.12.2"
+    "sharp": "0.35.3"
   },
   "devDependencies": {
-    "typescript": "6.0.2",
-    "mocha": "11.7.5",
-    "@types/mocha": "10.0.10",
-    "sinon": "21.1.2",
-    "@types/sinon": "21.0.1",
+    "@types/chai": "^5.2.3",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^26.1.2",
+    "@types/sinon": "^22.0.0",
     "chai": "6.2.2",
-    "@types/chai": "5.2.3"
+    "mocha": "11.8.0",
+    "sinon": "22.1.0",
+    "typescript": "6.0.3"
   },
   "scripts": {
     "build": "tsc",
-    "test": "mocha",
+    "test": "mocha --extension ts ./test --recursive",
     "start": "node ./src/web.ts"
   },
   "description": "Core functions to build a IIIF image server and a ready-to-go image server.",
