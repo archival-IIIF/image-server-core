@@ -1,11 +1,15 @@
 import sharp from 'sharp';
+import {URL} from 'node:url';
 import {join} from 'node:path';
 import {parseArgs} from 'node:util';
-import {URL} from 'node:url';
-import {createServer, ServerResponse} from 'node:http';
+import {readFileSync} from 'node:fs';
+import {createServer, IncomingMessage, ServerResponse} from 'node:http';
 
 import serveImage from './imageServer.ts';
+import getImageInfo from './imageInfo.ts';
 import {NotImplementedError, RequestError} from './errors.ts';
+
+const viewerHtml = readFileSync(new URL('./viewer.html', import.meta.url), 'utf8');
 
 const {values: {debug, port, root, concurrency}} = parseArgs({
     options: {
@@ -65,15 +69,15 @@ async function requestImage(parsedUrl: URL, parts: string[], res: ServerResponse
     debug && console.log(`Received a request for an image on path ${imagePath}`);
 
     const path = join(root as string, imagePath);
-    const maxValue = parsedUrl.searchParams.get('max');
-    if (maxValue !== null && (!/^\d+$/.test(maxValue) || !Number.isSafeInteger(Number(maxValue)) || Number(maxValue) <= 0))
-        throw new RequestError('max must be a finite positive integer');
-    const maxSize = maxValue !== null ? Number(maxValue) : null;
+    const maxSize = getMaxSize(parsedUrl);
 
     const image = await serveImage(path, maxSize, {region, size, rotation, quality, format});
 
     if (image.contentType) res.setHeader('Content-Type', image.contentType);
     if (image.contentLength) res.setHeader('Content-Length', String(image.contentLength));
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Cache-Control', 'public, max-age=3600');
+
     res.setHeader('Content-Disposition', `inline; filename="${imagePath}-${region}-${size}-${rotation}-${quality}.${format}"`);
     res.write(image.image);
     res.end();
@@ -81,12 +85,42 @@ async function requestImage(parsedUrl: URL, parts: string[], res: ServerResponse
     debug && console.log(`Sending an image on path ${imagePath}`);
 }
 
+async function requestInfo(imagePath: string, parsedUrl: URL, req: IncomingMessage, res: ServerResponse) {
+    const path = join(root as string, imagePath);
+    const origin = `http://${req.headers.host ?? 'localhost'}`;
+    const id = `${origin}/${encodeURI(imagePath)}`;
+    const info = await getImageInfo(path, id, getMaxSize(parsedUrl));
+
+    res.writeHead(200, {
+        'Content-Type': 'application/ld+json;profile="http://iiif.io/api/image/3/context.json"',
+        'Cache-Control': 'public, max-age=3600',
+        'Access-Control-Allow-Origin': '*',
+    });
+    res.end(JSON.stringify(info));
+}
+
+function getMaxSize(parsedUrl: URL): number | null {
+    const maxValue = parsedUrl.searchParams.get('max');
+    if (maxValue !== null && (!/^\d+$/.test(maxValue) || !Number.isSafeInteger(Number(maxValue)) || Number(maxValue) <= 0))
+        throw new RequestError('max must be a finite positive integer');
+    return maxValue !== null ? Number(maxValue) : null;
+}
+
+function requestViewer(res: ServerResponse) {
+    res.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'});
+    res.end(viewerHtml);
+}
+
 const server = createServer(async (req, res) => {
     try {
         const parsedUrl = new URL(`http:/localhost${req.url}`);
         const parts = parsedUrl.pathname.substring(1).split('/');
 
-        if (parts.length === 5 && parts[4].indexOf('.') >= 0) {
+        if (parts.length === 1 && parts[0] === 'viewer') {
+            requestViewer(res);
+        } else if (parts.length === 2 && parts[1] === 'info.json') {
+            await requestInfo(decodeURIComponent(parts[0]), parsedUrl, req, res);
+        } else if (parts.length === 5 && parts[4].indexOf('.') >= 0) {
             await requestImage(parsedUrl, parts, res);
         } else if (parts.length === 1 && parts[0].trim().length > 0) {
             res.writeHead(302, {'Location': parsedUrl.pathname! + '/info.json'});

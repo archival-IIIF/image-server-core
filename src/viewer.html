@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>IIIF image viewer</title>
+    <style>
+        html, body, #viewer {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            background: #111;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/openseadragon@6.1.0/build/openseadragon/openseadragon.min.js"></script>
+</head>
+<body>
+<div id="viewer"></div>
+<script>
+    let viewer;
+
+    function configureViewer() {
+        const infoUrl = new URL(window.location.href).searchParams.get('iiif');
+        if (!infoUrl) return;
+
+        if (viewer)
+            viewer.open(infoUrl);
+        else
+            viewer = OpenSeadragon({
+                id: 'viewer',
+                tileSources: infoUrl,
+                showNavigator: true,
+                prefixUrl: 'https://cdn.jsdelivr.net/npm/openseadragon@6.1.0/build/openseadragon/images/'
+            });
+    }
+
+    for (const method of ['pushState', 'replaceState']) {
+        const original = history[method];
+        history[method] = function (...args) {
+            const result = original.apply(this, args);
+            window.dispatchEvent(new Event('locationchange'));
+            return result;
+        };
+    }
+
+    window.addEventListener('popstate', () => window.dispatchEvent(new Event('locationchange')));
+    window.addEventListener('locationchange', configureViewer);
+
+    configureViewer();
+</script>
+</body>
+</html>

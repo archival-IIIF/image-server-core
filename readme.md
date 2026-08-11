@@ -8,21 +8,52 @@
 Archival IIIF image core provides the core functionality to build a IIIF image server, but also provides a server ready-to-go.
 </div>
 
-## Web API
+## IIIF Image API
 
-_See also the [IIIF Image API 2.1](https://iiif.io/api/image/2.1/)
-and the [IIIF Image API 3.0](https://iiif.io/api/image/3.0/)_
+The web server exposes an [IIIF Image API 3.0](https://iiif.io/api/image/3.0/) compliant service.
 
 **URL**: `/[id]/[region]/[size]/[rotation]/[quality].[format]`
 
 **Method**: `GET`
 
-E.g. http://localhost:3333/example.jpg/full/!100,100/0/default.jpg
+For example:
+
+```
+http://localhost:3333/example.jpg/full/!100,100/0/default.jpg
+```
+
+The optional `max` query parameter limits the image dimensions exposed to the request. It must be a positive integer:
+
+```
+http://localhost:3333/example.tif/full/max/0/default.jpg?max=5000
+```
+
+**URL**: `/[id]/info.json`
+
+**Method**: `GET`
+
+The endpoint returns IIIF Image API 3 metadata. It also accepts the same optional `max` parameter:
+
+```
+http://localhost:3333/example.tif/info.json
+http://localhost:3333/example.tif/info.json?max=5000
+```
+
+**URL**: `/viewer?iiif=[encoded-info.json-URI]`
+
+**Method**: `GET`
+
+The bundled full-page [OpenSeadragon](https://openseadragon.github.io/) viewer can be used to interact with the images
+using IIIF using the `iiif` query parameter. For example:
+
+```
+http://localhost:3333/viewer?iiif=http%3A%2F%2Flocalhost%3A3333%2Fexample.tif%2Finfo.json
+```
 
 ## Installation
 
 1. Install
-    * [Node.js 22.x LTS](https://nodejs.org/en)
+    * [Node.js 24.x LTS](https://nodejs.org/en)
     * [yarn](https://yarnpkg.com) or [npm](https://www.npmjs.com)
 2. Install dependencies
    ```sh

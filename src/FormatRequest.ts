@@ -16,6 +16,7 @@ export default class FormatRequest implements ImageRequest {
     parseImageRequest(): void {
         switch (this.request) {
             case 'jpg':
+            case 'jpeg':
                 this.id = 'jpeg';
                 break;
             case 'tif':
