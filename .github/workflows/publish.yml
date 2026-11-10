@@ -3,7 +3,7 @@ name: Publish to npm
 on:
   push:
     tags:
-      - '*'
+      - '[0-9]+.[0-9]+.[0-9]+*'
 
 permissions:
   contents: read
@@ -20,11 +20,11 @@ jobs:
           node-version: 26
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Tag muss zur Version in package.json passen
+      - name: Check that tag matches package.json version
         run: |
-          PKG_VERSION="v$(node -p "require('./package.json').version")"
+          PKG_VERSION="$(node -p "require('./package.json').version")"
           if [ "$PKG_VERSION" != "$GITHUB_REF_NAME" ]; then
-            echo "Tag $GITHUB_REF_NAME bot matching to package.json ($PKG_VERSION)"
+            echo "Tag $GITHUB_REF_NAME does not match package.json version ($PKG_VERSION)"
             exit 1
           fi
 
