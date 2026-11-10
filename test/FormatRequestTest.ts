@@ -60,7 +60,7 @@ describe('FormatRequest', () => {
             imageMock.restore();
         });
 
-        ['jpg', 'png', 'webp', 'tif'].forEach(request => {
+        ['jpeg', 'png', 'webp', 'tiff'].forEach(request => {
             it(`should execute the operation correctly for ${request}`, () => {
                 imageMock
                     .expects('toFormat')

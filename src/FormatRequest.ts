@@ -14,22 +14,25 @@ export default class FormatRequest implements ImageRequest {
     }
 
     parseImageRequest(): void {
+        this.formatOptions = {};
+
         switch (this.request) {
             case 'jpg':
             case 'jpeg':
                 this.id = 'jpeg';
                 break;
             case 'tif':
+            case 'tiff':
                 this.id = 'tiff';
                 break;
             case 'png':
             case 'webp':
+            case 'heif':
+                this.id = this.request;
+                break;
             case 'avif':
                 this.id = 'heif';
                 this.formatOptions = {compression: 'av1'} as HeifOptions;
-                break;
-            case 'heif':
-                this.id = this.request;
                 break;
             case 'gif':
             case 'jp2':
